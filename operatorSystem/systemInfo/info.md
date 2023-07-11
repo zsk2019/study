@@ -1,10 +1,13 @@
-# 操作系统
+#  操作系统
 #### （1） 进程与线程的区别和联系（重点）
+
+定义： 进程是正在运行的程序的实例，它有自己的内存空间、文件句柄和系统资源。线程是进程内的执行单元，一个进程可以包含多个线程。
+
 * 区别
-1. 进程是对运行时程序的封装，是系统进行资源分配和调度的基本单元，而线程是进程的子任务，是CPU分配和调度的基本单元。
-2. 一个进程可以有多个线程，但是一个线程只能属于一个进程。
-3. 进程的创建需要系统分配内存和CPU，文件句柄等资源，销毁时也要进行相应的回收，所以进程的管理开销很大；但是线程的管理开销则很小。
-4. 进程之间不会相互影响；而一个线程崩溃会导致进程崩溃，从而影响同个进程里面的其他线程。
+- 资源占用：每个进程都有独立的内存空间和系统资源，因此进程间的资源相互隔离。而线程共享进程的内存空间和资源，线程间可以直接访问彼此的数据。
+- 切换开销：由于进程之间的资源隔离，切换进程的开销比较大。需要保存和恢复进程的上下文信息。而线程切换的开销较小，因为线程共享进程的资源，只需切换线程的上下文即可。
+- 隔离性： 进程之间不会相互影响；而一个线程崩溃会导致进程崩溃，从而影响同个进程里面的其他线程。
+- 多核利用：多个进程可以在多个处理器核心上并行执行，从而提高系统的整体性能。而对于多线程来说，多个线程必须在同一个处理器核心上轮流执行，因此无法充分利用多核处理器的优势。
 
 * 联系 进程与线程之间的关系：线程是存在进程的内部，一个进程中可以有多个线程，一个线程只能存在一个进程中。
 #### （2） Linux理论上最多可以创建多少个进程？一个进程可以创建多少线程，和什么有关
@@ -27,7 +30,7 @@
 
   管道的底层实现 https://segmentfault.com/a/1190000009528245
 
-* 信号量：信号量是一个计数器，可以用来控制多个进程对共享资源的访问。信号量只有等待和发送两种操作。等待(P(sv))就是将其值减一或者挂起进程，发送(V(sv))就是将其值加一或者将进程恢复运行。
+* 信号量：用来控制多个进程对共享资源的访问, 信号量的基本概念是一个计数器和一个等待队列。计数器表示可用的资源数量，当计数器大于零时表示有可用资源，当计数器为零时表示资源已经被占用。等待队列用于存储等待获取资源的进程或线程。信号量只有等待和发送两种操作。等待(P(sv))就是将其值减一或者挂起进程，发送(V(sv))就是将其值加一或者将进程恢复运行。
 
 * 信号：信号是Linux系统中用于进程之间通信或操作的一种机制，信号可以在任何时候发送给某一进程，而无须知道该进程的状态。如果该进程并未处于执行状态，则该信号就由内核保存起来，知道该进程恢复执行并传递给他为止。如果一个信号被进程设置为阻塞，则该信号的传递被延迟，直到其阻塞被取消时才被传递给进程。 信号是开销最小的
 
@@ -69,66 +72,98 @@ https://zhuanlan.zhihu.com/p/141602175
 * 物理内存管理包括交换与覆盖，分页管理，分段管理和段页式管理等；
 * 虚拟内存管理包括虚拟内存的概念，页面置换算法，页面分配策略等；
 
+
+##### 虚拟内存：
+
+**概念**
+
+虚拟内存是一种由操作系统提供的抽象概念，它为每个进程提供了一种似乎具有连续且大于实际物理内存容量的地址空间的感觉。虚拟内存使得每个进程可以拥有自己的独立地址空间，而不需要了解实际的物理内存布局和限制。
+
+**虚拟内存作用**
+
+1. 内存隔离：每个进程都有自己的虚拟地址空间，使得每个进程彼此隔离，互不干扰。进程可以独立地使用它们的地址空间，而无需担心与其他进程的冲突。
+2. 内存扩展：虚拟内存使得进程可以访问大于物理内存容量的地址空间。进程可以将其虚拟地址空间划分为固定大小的页，并根据需要将这些页映射到物理内存或辅助存储器（如硬盘）。
+3. 内存保护：虚拟内存为每个页面提供了访问权限的控制，例如只读、读写或执行等。这样，操作系统可以通过页表中的访问权限位来保护内存的完整性和安全性，防止未经授权的访问。
+4. 内存共享：虚拟内存使得多个进程可以共享同一物理内存页面。这种共享可以节省内存空间，提高系统性能，并允许进程之间交换数据。
+
+ **虚拟内存实现机制**
+
+ 实现虚拟内存的关键是通过地址转换机制，通常是通过使用页表或段表来实现。这些表记录了虚拟地址和物理地址之间的映射关系。在访问内存时，CPU使用虚拟地址，而内存管理单元（MMU）负责将虚拟地址转换为物理地址
+
 （面试官这样问的时候，其实是希望你能讲讲虚拟内存）
 #### （7） 实现一个LRU算法
 用到两个数据结构：哈希+双向链表
 ```
-unordered_map<int,list<pair<int,int> > > cache ;// 存放键，迭代器
-list<pair<int,int>> auxlist; // 存放 <键，值>
-```
-```
+#include <iostream>
+#include <unordered_map>
+#include <list>
+
+using namespace std;
+
 class LRUCache {
-    int cap;
-    list<pair<int,int>> l;// front:new back:old 存放值 新的放前面，因为前面的可以取得有效的迭代器
-    map<int,list<pair<int,int> >::iterator > cache;// 存放键，迭代器
+private:
+    int capacity;
+    unordered_map<int, pair<int, list<int>::iterator>> cache; // 存储缓存的键值对
+    list<int> lruList; // 存储最近使用的键
+
 public:
     LRUCache(int capacity) {
-        cap=capacity;
+        this->capacity = capacity;
     }
 
     int get(int key) {
-        auto mapitera = cache.find(key);
-        if(mapitera==cache.end()){
+        if (cache.find(key) == cache.end()) {
+            // 键不存在于缓存中
             return -1;
-        }else{// found
-            list<pair<int,int>>::iterator listItera = mapitera->second;
-            int value = (*listItera).second;
-
-            l.erase(listItera);
-            l.push_front({key,value});
-            cache[key]=l.begin();
-
-            return value;
         }
+
+        // 将键移到最前面表示最近使用
+        lruList.erase(cache[key].second);
+        lruList.push_front(key);
+        cache[key].second = lruList.begin();
+
+        return cache[key].first;
     }
 
     void put(int key, int value) {
-        auto itera = cache.find(key);
-        if(itera!=cache.end()){// exist
-            list<pair<int,int>>::iterator listItera = itera->second;
-
-            l.erase(listItera);
-            l.push_front({key,value});
-            cache[key]=l.begin();
-
-        }else{// not exist
-            if(cache.size()>=cap){
-                pair<int,int> oldpair = l.back();
-                l.pop_back();
-                cache.erase(oldpair.first);
+        if (cache.find(key) != cache.end()) {
+            // 键已存在于缓存中
+            // 更新值，并将键移到最前面表示最近使用
+            lruList.erase(cache[key].second);
+            lruList.push_front(key);
+            cache[key] = make_pair(value, lruList.begin());
+        } else {
+            // 键不存在于缓存中
+            if (cache.size() == capacity) {
+                // 缓存已满，删除最近最少使用的键
+                int lastKey = lruList.back();
+                cache.erase(lastKey);
+                lruList.pop_back();
             }
-            l.push_front({key,value});
-            cache[key]=l.begin();
+
+            // 插入新的键值对
+            lruList.push_front(key);
+            cache[key] = make_pair(value, lruList.begin());
         }
     }
 };
 
-/**
- * Your LRUCache object will be instantiated and called as such:
- * LRUCache* obj = new LRUCache(capacity);
- * int param_1 = obj->get(key);
- * obj->put(key,value);
- */
+int main() {
+    LRUCache cache(2); // 创建一个容量为2的LRU缓存
+
+    cache.put(1, 1);
+    cache.put(2, 2);
+    cout << cache.get(1) << endl; // 输出 1
+    cache.put(3, 3); // 键2被淘汰
+    cout << cache.get(2) << endl; // 输出 -1，键2不再存在于缓存中
+    cache.put(4, 4); // 键1被淘汰
+    cout << cache.get(1) << endl; // 输出 -1，键1不再存在于缓存中
+    cout << cache.get(3) << endl; // 输出 3
+    cout << cache.get(4) << endl; // 输出 4
+
+    return 0;
+}
+
 ```
 #### （8） 死锁产生的必要条件（怎么检测死锁，解决死锁问题）
 （1） 互斥：一个资源每次只能被一个进程使用。<br>
