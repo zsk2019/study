@@ -584,6 +584,30 @@ https://www.cnblogs.com/qingjiaowoxiaoxioashou/p/5874572.html
 
 
 
+#### （60）C++原子操作
+
+std::atomic 是 C++ 标准库中提供的模板类，用于实现原子操作。它提供了一种线程安全的方式来对内存进行原子操作，避免了多线程并发访问时可能出现的竞态条件
+
+```
+#include <atomic>
+
+std::atomic<int> myAtomicInt(0); // 声明一个原子整型变量
+
+// 使用原子操作更新变量的值
+myAtomicInt.store(42); // 存储新的值（赋值）
+int oldValue = myAtomicInt.exchange(10); // 交换新值并返回旧值
+bool success = myAtomicInt.compare_exchange_strong(oldValue, 20); // 比较并交换
+
+// 使用原子操作读取变量的值
+int currentValue = myAtomicInt.load(); // 读取当前值
+
+// 原子操作的其他成员函数和操作符
+
+```
+
+
+
+
 
 
 
