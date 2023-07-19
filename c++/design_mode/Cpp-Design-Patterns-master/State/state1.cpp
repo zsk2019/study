@@ -29,7 +29,7 @@ public:
         }
     }
 
-    public void Operation2(){
+    void Operation2() {
 
         if (state == Network_Open){
             
@@ -46,12 +46,9 @@ public:
             //$$$$$$$$$$
             state = Network_Close;
         }
-    
     }
 
-    public void Operation3(){
-
-    }
+    void Operation3() {}
 };
 
 

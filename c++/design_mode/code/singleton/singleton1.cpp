@@ -111,6 +111,7 @@ void Singleton4::destoryInstance() {
 堆上创建
 可手动销毁
 锁的代价过高
+推荐使用
 */
 
 class Singleton5 {
@@ -197,5 +198,4 @@ Singleton6 *Singleton6::getInstance() {
 线程安全
 堆上创建
 可手动销毁
-解决内存读写reorder不安全
 */

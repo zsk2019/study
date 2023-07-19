@@ -1,10 +1,11 @@
 
-class TaxStrategy{
+
+class Context {};
+class TaxStrategy {
 public:
     virtual double Calculate(const Context& context)=0;
     virtual ~TaxStrategy(){}
 };
-
 
 class CNTax : public TaxStrategy{
 public:
@@ -27,10 +28,6 @@ public:
     }
 };
 
-
-
-//��չ
-//*********************************
 class FRTax : public TaxStrategy{
 public:
 	virtual double Calculate(const Context& context){
@@ -38,13 +35,13 @@ public:
 	}
 };
 
+// class StrategyFactory
 
 class SalesOrder{
 private:
     TaxStrategy* strategy;
 
-public:
-    // ����ģʽ
+  public:
     SalesOrder(StrategyFactory* strategyFactory){
         this->strategy = strategyFactory->NewStrategy();
     }
@@ -52,13 +49,9 @@ public:
         delete this->strategy;
     }
 
-    public double CalculateTax(){
-        //...
-        Context context();
-
-        double val =
-            strategy->Calculate(context); //��̬����
-        //...
+    double CalculateTax() {
+        Context context;
+        double val = strategy->Calculate(context);
     }
 
 };//拓展税收的种类，SalesOrder模块不用修改，几个策略是平衡的关系

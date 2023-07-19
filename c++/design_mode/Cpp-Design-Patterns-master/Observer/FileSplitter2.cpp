@@ -1,3 +1,8 @@
+#include <list>
+#include <string>
+
+using std::string, std::list;
+
 class IProgress{
 public:
 	virtual void DoProgress(float value)=0;
@@ -10,49 +15,33 @@ class FileSplitter
 	string m_filePath;
 	int m_fileNumber;
 
-	List<IProgress*>  m_iprogressList; // 抽象通知机制，支持多个观察者
-	
-public:
-	FileSplitter(const string& filePath, int fileNumber) :
-		m_filePath(filePath), 
-		m_fileNumber(fileNumber){
+        list<IProgress *> m_iprogresslist;
 
-	}
+      public:
+        FileSplitter(const string &filePath, int fileNumber)
+            : m_filePath(filePath), m_fileNumber(fileNumber) {}
 
+        void split() {
+          for (int i = 0; i < m_fileNumber; i++) {
+            float progressValue = m_fileNumber;
+            progressValue = (i + 1) / progressValue;
+            onProgress(progressValue);
+          }
+        }
 
-	void split(){
+        void addIProgress(IProgress *iprogress) {
+          m_iprogresslist.push_back(iprogress);
+        }
 
-		//1.读取大文件
-
-		//2.分批次向小文件中写入
-		for (int i = 0; i < m_fileNumber; i++){
-			//...
-
-			float progressValue = m_fileNumber;
-			progressValue = (i + 1) / progressValue;
-			onProgress(progressValue);//发送通知
-		}
-
-	}
-
-
-	void addIProgress(IProgress* iprogress){
-		m_iprogressList.push_back(iprogress);
-	}
-
-	void removeIProgress(IProgress* iprogress){
-		m_iprogressList.remove(iprogress);
-	}
-
+        void removeIProgress(IProgress *iprogress) {
+          m_iprogresslist.remove(iprogress);
+        }
 
 protected:
 	virtual void onProgress(float value){
-		
-		List<IProgress*>::iterator itor=m_iprogressList.begin();
-
-		while (itor != m_iprogressList.end() )
-			(*itor)->DoProgress(value); //更新进度条
-			itor++;
-		}
-	}
+          list<IProgress *>::iterator itor = m_iprogresslist.begin();
+          while (itor != m_iprogresslist.end())
+            (*itor)->DoProgress(value);
+          itor++;
+        }
 };
